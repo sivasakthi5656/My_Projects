@@ -1,11 +1,10 @@
 import java.util.Scanner;
 
-public class PlagiarismDetection {
+public class PlagiarismDetectionRabinKarp {
 
-    // Prime number for hashing
-    private static final int PRIME = 101;
+    private static final int PRIME = 101; // Base for hashing
 
-    // Function to calculate hash of a string
+    // Calculate hash of a string
     public static long calculateHash(String str) {
         long hash = 0;
         for (int i = 0; i < str.length(); i++) {
@@ -14,10 +13,12 @@ public class PlagiarismDetection {
         return hash;
     }
 
-    // Rabin-Karp based substring matching
+    // Rabin–Karp substring check
     public static boolean containsSubstring(String text, String pattern) {
         int m = pattern.length();
         int n = text.length();
+        if (m > n) return false;
+
         long patternHash = calculateHash(pattern);
 
         for (int i = 0; i <= n - m; i++) {
@@ -31,14 +32,19 @@ public class PlagiarismDetection {
         return false;
     }
 
-    // Function to calculate similarity percentage
+    // Similarity calculation
     public static double similarity(String text1, String text2) {
-        String[] words1 = text1.split("\\s+");
-        String[] words2 = text2.split("\\s+");
+        if (text1 == null || text1.trim().isEmpty()) return 0.0;
 
+        // Normalize: lowercase & remove punctuation
+        String t1 = text1.toLowerCase().replaceAll("[^a-z0-9\\s-]", " ");
+        String t2 = text2.toLowerCase().replaceAll("[^a-z0-9\\s-]", " ");
+
+        String[] words1 = t1.trim().split("\\s+");
         int matches = 0;
+
         for (String word : words1) {
-            if (containsSubstring(text2, word)) {
+            if (!word.isEmpty() && containsSubstring(t2, word)) {
                 matches++;
             }
         }
