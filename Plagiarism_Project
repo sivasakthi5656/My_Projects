@@ -1,0 +1,69 @@
+import java.util.Scanner;
+
+public class PlagiarismDetection {
+
+    // Prime number for hashing
+    private static final int PRIME = 101;
+
+    // Function to calculate hash of a string
+    public static long calculateHash(String str) {
+        long hash = 0;
+        for (int i = 0; i < str.length(); i++) {
+            hash += str.charAt(i) * Math.pow(PRIME, i);
+        }
+        return hash;
+    }
+
+    // Rabin-Karp based substring matching
+    public static boolean containsSubstring(String text, String pattern) {
+        int m = pattern.length();
+        int n = text.length();
+        long patternHash = calculateHash(pattern);
+
+        for (int i = 0; i <= n - m; i++) {
+            String sub = text.substring(i, i + m);
+            if (calculateHash(sub) == patternHash) {
+                if (sub.equals(pattern)) { // Confirm match
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Function to calculate similarity percentage
+    public static double similarity(String text1, String text2) {
+        String[] words1 = text1.split("\\s+");
+        String[] words2 = text2.split("\\s+");
+
+        int matches = 0;
+        for (String word : words1) {
+            if (containsSubstring(text2, word)) {
+                matches++;
+            }
+        }
+
+        return (matches * 100.0) / words1.length;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Enter first text:");
+        String text1 = sc.nextLine();
+
+        System.out.println("Enter second text:");
+        String text2 = sc.nextLine();
+
+        double similarityPercentage = similarity(text1, text2);
+        System.out.println("Similarity: " + String.format("%.2f", similarityPercentage) + "%");
+
+        if (similarityPercentage > 50) {
+            System.out.println("Possible plagiarism detected!");
+        } else {
+            System.out.println("No significant plagiarism detected.");
+        }
+
+        sc.close();
+    }
+}
